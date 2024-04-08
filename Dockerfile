@@ -12,13 +12,13 @@ RUN pip install poetry
 
 # Install project dependencies using Poetry
 RUN poetry config virtualenvs.create false \
-    && poetry update && poetry install --no-dev
-
-# Create temporal database for test
-RUN poetry run alembic upgrade head
+    && poetry install --no-dev
 
 # Copy the application code to the working directory
 COPY . .
+
+# Create temporal database for test
+RUN poetry run alembic upgrade head
 
 # Expose the port on which the FastAPI server will run
 EXPOSE 8000
