@@ -14,6 +14,9 @@ RUN pip install poetry
 RUN poetry config virtualenvs.create false \
     && poetry install --no-interaction --no-ansi
 
+# Create temporal database for test
+RUN poetry run alembic upgrade head
+
 # Copy the application code to the working directory
 COPY . .
 
