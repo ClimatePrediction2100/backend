@@ -12,7 +12,7 @@ RUN pip install poetry
 
 # Install project dependencies using Poetry
 RUN poetry config virtualenvs.create false \
-    && poetry install --no-interaction --no-ansi
+    && poetry update && poetry install --no-dev
 
 # Create temporal database for test
 RUN poetry run alembic upgrade head
