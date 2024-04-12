@@ -2,7 +2,6 @@ from fastapi import FastAPI
 import uvicorn
 from starlette.middleware.cors import CORSMiddleware
 
-from app.domain.condition import condition_router
 from app.domain.temperature import temperature_router
 
 app = FastAPI()
@@ -17,5 +16,4 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(condition_router.router)
 app.include_router(temperature_router.router)
