@@ -9,6 +9,8 @@ from app.domain.temperature import temperature_crud, temperature_schema
 
 from app.models import Observed, Predicted
 
+import random
+
 router = APIRouter(
     prefix="/temperature",
 )
@@ -29,16 +31,12 @@ async def get_result_list(
     return result
 
 
-import random
-
-created = False
-
-
 @router.post("/dummy", status_code=status.HTTP_201_CREATED)
 async def generate_dummy(db: Session = Depends(get_db)):
-    if created:
+    stmt = select(Observed).where(Observed.year == 2000).where(Observed.latitude == 0).where(Observed.longitude == 0)
+    one = (await db.execute(stmt)).scalars().all()
+    if len(one) > 0:
         return
-    created = True
     observed_list = []
     for season in range(5):
         for year in range(1850, 2014):
