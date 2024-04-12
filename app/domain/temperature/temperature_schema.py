@@ -1,6 +1,41 @@
 import datetime
 
+from typing import Optional
 from pydantic import BaseModel, field_validator
+
+
+class Condition(BaseModel):
+    location: Optional[str] = None
+    latitude: Optional[int] = None
+    longitude: Optional[int] = None
+    ssp: int
+    season: int
+
+
+class Observed(BaseModel):
+    class Config:
+        from_attributes = True
+
+    year: int
+    average: float
+
+
+class Predicted(BaseModel):
+    class Config:
+        from_attributes = True
+
+    year: int
+    highest: float
+    average: float
+    lowest: float
+
+
+class Result(BaseModel):
+    class Config:
+        from_attributes = True
+
+    observeds: list[Observed]
+    predicteds: list[Predicted]
 
 
 class Temperature(BaseModel):
