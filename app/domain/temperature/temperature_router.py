@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from sqlalchemy import select
+from sqlalchemy import select, exists, delete
 from starlette import status
 
 from app.database import get_db
@@ -32,19 +32,23 @@ async def get_result_list(
 
 
 @router.post("/dummy", status_code=status.HTTP_201_CREATED)
-async def generate_dummy(db: Session = Depends(get_db)):
-    stmt = select(Observed).where(Observed.year == 2000).where(Observed.latitude == 0).where(Observed.longitude == 0)
-    one = (await db.execute(stmt)).scalars().all()
-    if len(one) > 0:
-        return
+async def generate_dummy(db: Session = Depends(get_db), dummy: temperature_schema.Dummy = Depends()):
+    stmt = select(exists().select_from(Observed))
+    exist = (await db.execute(stmt)).scalar()
+    if exist:
+        stmt = delete(Observed)
+        await db.execute(stmt)
+        stmt = delete(Predicted)
+        await db.execute(stmt)
+        await db.commit()
     observed_list = []
     for season in range(5):
         for year in range(1850, 2014):
             for latitude in range(0, 2):
                 for longitude in range(0, 2):
                     average = (
-                        -5
-                        + (year - 1850) * 10 / (2100 - 1850)
+                        dummy.min_temp
+                        + (year - 1850) * (dummy.max_temp - dummy.min_temp) / (2100 - 1850)
                         + random.uniform(-0.05, 0.05)
                     )
                     observed_list.append(
@@ -63,12 +67,12 @@ async def generate_dummy(db: Session = Depends(get_db)):
                 for latitude in range(0, 2):
                     for longitude in range(0, 2):
                         average = (
-                            -5
-                            + (year - 1850) * 10 / (2100 - 1850)
+                            dummy.min_temp
+                            + (year - 1850) * (dummy.max_temp - dummy.min_temp) / (2100 - 1850)
                             + random.uniform(-0.05, 0.05)
                         )
-                        lowest = average - random.uniform(0.005, 0.02)
-                        highest = average + random.uniform(0.005, 0.02)
+                        lowest = average - random.uniform(dummy.interval, dummy.interval * 2)
+                        highest = average + random.uniform(dummy.interval, dummy.interval * 2)
 
                         predicted_list.append(
                             Predicted(
