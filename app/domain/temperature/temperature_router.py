@@ -7,7 +7,7 @@ from app.database import get_db
 
 from app.domain.temperature import temperature_crud, temperature_schema
 
-from app.models import Observed, Predicted
+from app.models import Observed, Predicted, Location
 
 import random
 
@@ -21,14 +21,38 @@ async def get_result_list(
     db: Session = Depends(get_db), condition: temperature_schema.Condition = Depends()
 ):
     if condition.location is not None:
-        location_id = await temperature_crud.get_location_id(db, condition.location)
-        coordinate_list = await temperature_crud.get_coordinate_list(db, location_id)
-        condition.latitude = coordinate_list[0].latitude
-        condition.longitude = coordinate_list[0].longitude
+        location = await temperature_crud.get_location(db, condition.location)
+        if location is None:
+            return []
+        else:
+            condition.latitude = location.latitude
+            condition.longitude = location.longitude
     observeds = await temperature_crud.get_observed_list(db, condition)
     predicteds = await temperature_crud.get_predicted_list(db, condition)
-    result = temperature_schema.Result(observeds=observeds, predicteds=predicteds)
+    result = temperature_schema.Result(latitude=condition.latitude, longitude=condition.longitude, observeds=observeds, predicteds=predicteds)
     return result
+
+
+@router.get("/location", response_model=list[temperature_schema.Location])
+async def get_location_list(db: Session = Depends(get_db)):
+    locations = await temperature_crud.get_location_list(db)
+    return locations
+
+
+@router.post("/location", status_code=status.HTTP_201_CREATED)
+async def create_location(db: Session = Depends(get_db), location: temperature_schema.Location = Depends()):
+    db.add(Location(
+        name=location.name,
+        latitude=location.latitude,
+        longitude=location.longitude
+    ))
+    await db.commit()
+
+@router.delete("/location", status_code=status.HTTP_200_OK)
+async def delete_location(db: Session = Depends(get_db), location_name: temperature_schema.LocationName = Depends()):
+    stmt = delete(Location).where(Location.name == location_name.name)
+    await db.execute(stmt)
+    await db.commit()
 
 
 @router.post("/dummy", status_code=status.HTTP_201_CREATED)
@@ -71,8 +95,11 @@ async def generate_dummy(db: Session = Depends(get_db), dummy: temperature_schem
                             + (year - 1850) * (dummy.max_temp - dummy.min_temp) / (2100 - 1850)
                             + random.uniform(-0.05, 0.05)
                         )
-                        lowest = average - random.uniform(dummy.interval, dummy.interval * 2)
-                        highest = average + random.uniform(dummy.interval, dummy.interval * 2)
+
+                        interval = dummy.interval * (year - 2014) / (2100 - 2014)
+
+                        lowest = average - random.uniform(interval, interval * dummy.degree)
+                        highest = average + random.uniform(interval, interval * dummy.degree)
 
                         predicted_list.append(
                             Predicted(

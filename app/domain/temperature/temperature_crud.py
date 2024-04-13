@@ -1,23 +1,21 @@
 from datetime import datetime
 
 from app.domain.temperature.temperature_schema import Condition
-from app.models import Observed, Predicted, Location, Coordinate
+from app.models import Observed, Predicted, Location
 from sqlalchemy.orm import Session
 from sqlalchemy import select, insert, column
 
 
-async def get_location_id(db: Session, location_name: str):
-    stmt = select(Location.id).where(Location.name == location_name)
-    location_id = (await db.execute(stmt)).scalar_one()
-    return location_id
+async def get_location(db: Session, location_name: str):
+    stmt = select(Location).where(Location.name == location_name)
+    location = (await db.execute(stmt)).scalar_one_or_none()
+    return location
 
 
-async def get_coordinate_list(db: Session, location_id: int):
-    stmt = select(Coordinate.latitude, Condition.longitude).where(
-        Coordinate.location_id == location_id
-    )
-    coordinate_list = (await db.execute(stmt)).scalars().all()
-    return coordinate_list
+async def get_location_list(db: Session):
+    stmt = select(Location)
+    location_list = (await db.execute(stmt)).scalars().all()
+    return location_list
 
 
 async def get_observed_list(db: Session, condition: Condition):

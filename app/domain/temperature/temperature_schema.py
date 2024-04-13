@@ -34,6 +34,8 @@ class Result(BaseModel):
     class Config:
         from_attributes = True
 
+    latitude: int
+    longitude: int
     observeds: list[Observed]
     predicteds: list[Predicted]
 
@@ -41,6 +43,24 @@ class Result(BaseModel):
 class Dummy(BaseModel):
     class Config:
         from_attributes = True
+
     min_temp: float = -3.0
     max_temp: float = 3.0
-    interval: float = 0.05
+    interval: float = 1.0
+    degree: float = 1.5
+
+
+class Location(BaseModel):
+    class Config:
+        from_attributes = True
+
+    name: str
+    latitude: int
+    longitude: int
+
+
+class LocationName(BaseModel):
+    class Config:
+        from_attributes = True
+
+    name: str

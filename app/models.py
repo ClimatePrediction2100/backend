@@ -27,18 +27,10 @@ class Predicted(Base):
     average = Column(Float, nullable=False)
     lowest = Column(Float, nullable=False)
 
-
 class Location(Base):
     __tablename__ = "location"
 
     id = Column(Integer, primary_key=True)
     name = Column(String(length=32), nullable=False)
-
-
-class Coordinate(Base):
-    __tablename__ = "coordinate"
-
-    id = Column(Integer, primary_key=True)
-    location_id = Column(Integer, nullable=False)
     latitude = Column(Integer, nullable=False)
     longitude = Column(Integer, nullable=False)
