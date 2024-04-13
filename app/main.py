@@ -6,7 +6,7 @@ from app.domain.temperature import temperature_router
 
 app = FastAPI()
 
-origins = ["http://localhost:5173", "http://127.0.0.1:5173"]
+origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
