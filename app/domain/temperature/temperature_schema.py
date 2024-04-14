@@ -34,7 +34,7 @@ class Result(BaseModel):
     class Config:
         from_attributes = True
 
-    location: str
+    location: Optional[str]
     latitude: int
     longitude: int
     observeds: list[Observed]
