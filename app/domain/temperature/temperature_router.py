@@ -29,7 +29,7 @@ async def get_result_list(
             condition.longitude = location.longitude
     observeds = await temperature_crud.get_observed_list(db, condition)
     predicteds = await temperature_crud.get_predicted_list(db, condition)
-    result = temperature_schema.Result(latitude=condition.latitude, longitude=condition.longitude, observeds=observeds, predicteds=predicteds)
+    result = temperature_schema.Result(location=condition.location, latitude=condition.latitude, longitude=condition.longitude, observeds=observeds, predicteds=predicteds)
     return result
 
 
