@@ -10,7 +10,7 @@ import httpx
 async def get_temperature_list(location: str, latitude: int, longitude: int, ssp: str, season: str):
     async with httpx.AsyncClient() as client:
         response = await client.get(
-            "http://localhost:8001/data",
+            "http://database:8001/data",
             params={
                 "continent": location,
                 "latitude": latitude,
