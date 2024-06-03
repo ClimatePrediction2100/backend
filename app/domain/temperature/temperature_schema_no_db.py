@@ -25,7 +25,7 @@ ssp_mapping = {
 }
 
 season_mapping = {
-    "연평균": None,
+    "연평균": "Yearly",
     "봄": "Spring",
     "여름": "Summer",
     "가을": "Fall",
@@ -41,7 +41,7 @@ class Condition(BaseModel):
     latitude: Optional[int] = None
     longitude: Optional[int] = None
     ssp: str
-    season: Optional[str] = None
+    season: str
 
     @field_validator('location')
     def convert_location(cls, value):
@@ -87,7 +87,7 @@ class Result(BaseModel):
     latitude: Optional[int] = None
     longitude: Optional[int] = None
     ssp: str
-    season: Optional[str]
+    season: str
     observeds: list[Observed]
     predicteds: list[Predicted]
 
@@ -102,3 +102,24 @@ class Result(BaseModel):
     @field_validator('season')
     def reverse_convert_season(cls, value):
         return get_key_from_value(season_mapping, value)
+    
+
+if __name__ == "__main__":
+
+    condition = Condition(
+        location="아시아",
+        ssp="SSP1-1.9",
+        season="연평균",
+    )
+
+    print(condition)
+
+    result = Result(
+        location="Asia",
+        ssp="119",
+        season=None,
+        observeds=[],
+        predicteds=[]
+    )
+
+    print(result)
