@@ -1,7 +1,36 @@
-import datetime
-
 from typing import Optional
 from pydantic import BaseModel, field_validator
+
+
+continent_mapping = {
+    "전 세계": "World",
+    "아시아": "Asia",
+    "유럽": "Europe",
+    "아프리카": "Africa",
+    "북아메리카": "North America",
+    "남아메리카": "South America",
+    "오세아니아": "Oceania",
+    "남극": "Antarctica"
+}
+
+ssp_mapping = {
+    "SSP1-1.9": "119",
+    "SSP1-2.6": "126",
+    "SSP2-4.5": "245",
+    "SSP3-7.0": "370",
+    "SSP4-3.4": "434",
+    "SSP4-6.0": "460",
+    "SSP5-3.5": "535",
+    "SSP5-8.5": "585"
+}
+
+season_mapping = {
+    "연평균": None,
+    "봄": "Spring",
+    "여름": "Summer",
+    "가을": "Fall",
+    "겨울": "Winter"
+}
 
 
 class Condition(BaseModel):
@@ -11,6 +40,23 @@ class Condition(BaseModel):
     ssp: str
     season: str
 
+    @field_validator('location')
+    def convert_location(cls, value):
+        if value in continent_mapping:
+            return continent_mapping[value]
+        return value
+
+    @field_validator('ssp')
+    def convert_ssp(cls, value):
+        if value in ssp_mapping:
+            return ssp_mapping[value]
+        return value
+
+    @field_validator('season')
+    def convert_season(cls, value):
+        if value in season_mapping:
+            return season_mapping[value]
+        return value
 
 class Observed(BaseModel):
     class Config:
