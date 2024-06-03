@@ -20,12 +20,6 @@ router = APIRouter(
 async def get_result_list(condition: temperature_schema_no_db.Condition = Depends()):
     data = await temperature_crud_no_db.get_temperature_list(
         condition.location, condition.latitude, condition.longitude, condition.ssp, condition.season)
-
-    # data = {
-    #     'max': [i * 100 for i in range(2100 - 1850)],
-    #     'avg': [i * 10 for i in range(2100 - 1850)],
-    #     'min': [i * 1 for i in range(2100 - 1850)]
-    # }
     
     if not condition.location:
         data['min'] = data['avg']
