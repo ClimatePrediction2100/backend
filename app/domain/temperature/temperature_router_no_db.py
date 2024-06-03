@@ -29,18 +29,18 @@ async def get_result_list(condition: temperature_schema_no_db.Condition = Depend
     for i in range(min(len(data['avg']), 174)):
         observeds.append({
             'year': 1850 + i,
-            'average': data['avg'][i]
+            'average': data['avg'][i] + 0.3 if data['avg'][i] is not None else None
         })
 
     predicteds = []
     for i in range(174, len(data['avg'])):
         predicteds.append({
             'year': 1850 + i,
-            'highest': data['max'][i],
-            'average': data['avg'][i],
-            'lowest': data['min'][i]
+            'highest': data['max'][i] + 0.3 if data['max'][i] is not None else None,
+            'average': data['avg'][i] + 0.3 if data['avg'][i] is not None else None,
+            'lowest': data['min'][i] + 0.3 if data['min'][i] is not None else None,
         })
-    
+        
     
     result = temperature_schema_no_db.Result(
         location=condition.location,
