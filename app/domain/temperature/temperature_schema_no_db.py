@@ -32,13 +32,16 @@ season_mapping = {
     "겨울": "Winter"
 }
 
+def get_key_from_value(mapping, value):
+    return next((k for k, v in mapping.items() if v == value), value)
+
 
 class Condition(BaseModel):
     location: Optional[str] = None
     latitude: Optional[int] = None
     longitude: Optional[int] = None
     ssp: str
-    season: str
+    season: Optional[str] = None
 
     @field_validator('location')
     def convert_location(cls, value):
@@ -83,5 +86,19 @@ class Result(BaseModel):
     location: Optional[str] = None
     latitude: Optional[int] = None
     longitude: Optional[int] = None
+    ssp: str
+    season: Optional[str]
     observeds: list[Observed]
     predicteds: list[Predicted]
+
+    @field_validator('location')
+    def reverse_convert_location(cls, value):
+        return get_key_from_value(continent_mapping, value)
+
+    @field_validator('ssp')
+    def reverse_convert_ssp(cls, value):
+        return get_key_from_value(ssp_mapping, value)
+
+    @field_validator('season')
+    def reverse_convert_season(cls, value):
+        return get_key_from_value(season_mapping, value)

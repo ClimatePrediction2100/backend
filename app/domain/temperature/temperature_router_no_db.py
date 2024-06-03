@@ -46,6 +46,8 @@ async def get_result_list(condition: temperature_schema_no_db.Condition = Depend
         location=condition.location,
         latitude=condition.latitude,
         longitude=condition.longitude,
+        ssp=condition.ssp,
+        season=condition.season,
         observeds=observeds,
         predicteds=predicteds
     )
